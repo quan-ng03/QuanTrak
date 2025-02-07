@@ -1,0 +1,23 @@
+
+services:
+  frontend:
+    image: country-tracker-frontend
+    build:
+      context: ./frontend
+    ports:
+      - "5030:8080"  # Host:Container
+    volumes:
+        - dataprotection-keys:/app/keys
+    depends_on:
+      - backend
+
+  backend:
+    image: country-tracker-backend
+    build:
+      context: ./backend
+    ports:
+      - "5181:8080"  # Host:Container
+    volumes:
+        - dataprotection-keys:/app/keys
+volumes:
+  dataprotection-keys:

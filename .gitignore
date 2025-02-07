@@ -364,13 +364,7 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-### Docker ###
-# Ignore Docker files
-**/docker-compose.yml
-**/Dockerfile
-**/.dockerignore
-**/docker-compose.override.yml
-**/docker-compose.*.yml
+
 
 ### SQL Server ###
 # Ignore SQL Server files
@@ -381,27 +375,10 @@ FodyWeavers.xsd
 *.mdf
 *.ndf
 
-### Blazor ###
-# Ignore Blazor-specific files
-**/wwwroot/lib/
-**/wwwroot/dist/
-**/wwwroot/css/
-**/wwwroot/js/
-**/wwwroot/favicon.ico
-**/wwwroot/index.html
-**/wwwroot/_framework/
-**/wwwroot/_content/
-**/wwwroot/_bin/
-**/wwwroot/_blazor/
+
 
 ### .NET Core ###
 # Ignore .NET Core-specific files
-**/appsettings.Development.json
-**/appsettings.json
-**/appsettings.*.json
-**/launchSettings.json
-**/Properties/
-**/wwwroot/
 **/bin/
 **/obj/
 **/.vs/
