@@ -1,13 +1,10 @@
-
 services:
   frontend:
     image: country-tracker-frontend
     build:
       context: ./frontend
     ports:
-      - "5030:8080"  # Host:Container
-    volumes:
-        - dataprotection-keys:/app/keys
+      - "5030:80"  # Host (5030) maps to Container (80 - Nginx)
     depends_on:
       - backend
 
@@ -16,8 +13,6 @@ services:
     build:
       context: ./backend
     ports:
-      - "5181:8080"  # Host:Container
-    volumes:
-        - dataprotection-keys:/app/keys
-volumes:
-  dataprotection-keys:
+      - "5181:8080"
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
