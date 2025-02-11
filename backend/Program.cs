@@ -1,20 +1,24 @@
-using Microsoft.AspNetCore.DataProtection;
+using backend.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddDbContext<CountryContext>(options =>
+	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 var app = builder.Build();
 
-app.UseSwagger();
-app.UseSwaggerUI(c =>
+if (app.Environment.IsDevelopment())
 {
-	c.SwaggerEndpoint("/swagger/v1/swagger.json", "Country Tracker API v1");
-});
+	app.UseSwagger();
+	app.UseSwaggerUI();
+}
 
 app.UseAuthorization();
 
