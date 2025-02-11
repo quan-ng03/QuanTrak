@@ -8,16 +8,18 @@ public class InternetStatistic
 
 	public int Id { get; set; }
 
-	[ForeignKey("Country")]
-	public string? Code { get; set; }
+	[Required]
+	[ForeignKey(nameof(Country))]
+	public string? CountryCode { get; set; }
 
-	public int? YearWB { get; set; }
 	public decimal? PercentWB { get; set; }
+	public int? YearWB { get; set; }
 
-	public int? YearITU { get; set; }
 	public decimal? PercentITU { get; set; }
+	public int? YearITU { get; set; }
 
-	public int? YearCIA { get; set; }
 	public long? PopulationCIA { get; set; }
-
+	public int? YearCIA { get; set; }
+	
+	public Country? Country { get; set; }
 }

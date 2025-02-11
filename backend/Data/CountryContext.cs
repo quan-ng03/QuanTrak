@@ -11,5 +11,5 @@ public class CountryContext : DbContext
 
 	public DbSet<Country> Countries => Set<Country>();
 
-	public DbSet<InternetStatistic> internetStatistics => Set<InternetStatistic>();
+	public DbSet<InternetStatistic> InternetStatistics => Set<InternetStatistic>();
 }

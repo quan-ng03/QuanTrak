@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using backend.Data;
 
@@ -10,9 +11,11 @@ using backend.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(CountryContext))]
-    partial class CountryContextModelSnapshot : ModelSnapshot
+    [Migration("20250211090701_Setup#1")]
+    partial class Setup1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,8 +47,7 @@ namespace backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CountryCode")
-                        .IsRequired()
+                    b.Property<string>("Code")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal?>("PercentITU")
@@ -68,7 +70,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CountryCode");
+                    b.HasIndex("Code");
 
                     b.ToTable("InternetStatistics");
                 });
@@ -77,9 +79,7 @@ namespace backend.Migrations
                 {
                     b.HasOne("backend.Models.Country", "Country")
                         .WithMany("InternetStatistics")
-                        .HasForeignKey("CountryCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Code");
 
                     b.Navigation("Country");
                 });

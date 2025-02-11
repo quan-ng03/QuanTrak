@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 public class Country
 {
 	[Key]
+	[Required]
 	public string? Code { get; set; }
 
 	[Required]
