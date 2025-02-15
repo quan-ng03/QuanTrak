@@ -1,6 +1,6 @@
 using backend.Data;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +11,8 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<CountryContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<CountryService>();
 
 var app = builder.Build();
 

@@ -1,6 +1,7 @@
 namespace backend.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Microsoft.OpenApi.Models;
 
 public class InternetStatistic
@@ -20,6 +21,7 @@ public class InternetStatistic
 
 	public long? PopulationCIA { get; set; }
 	public int? YearCIA { get; set; }
-	
+
+	[JsonIgnore]
 	public Country? Country { get; set; }
 }
