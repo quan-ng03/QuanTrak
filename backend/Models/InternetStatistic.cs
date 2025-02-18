@@ -6,9 +6,7 @@ using Microsoft.OpenApi.Models;
 
 public class InternetStatistic
 {
-
-	public int Id { get; set; }
-
+	[Key]
 	[Required]
 	[ForeignKey(nameof(Country))]
 	public string? CountryCode { get; set; }

@@ -8,19 +8,21 @@ namespace backend.Controllers;
 [Route("[controller]")]
 public class CountryController : ControllerBase
 {
-	CountryService _service;
+	private readonly CountryService _service;
 
 	public CountryController(CountryService service)
 	{
 		_service = service;
 	}
 
+	// GET all countries
 	[HttpGet]
 	public IEnumerable<string>GetAll()
 	{
 		return _service.GetAll();
 	}
 
+	// GET a certain country
 	[HttpGet("{name}")]
 	public ActionResult<Country> GetByName(string name)
 	{
@@ -34,4 +36,35 @@ public class CountryController : ControllerBase
 			return NotFound();
 		}
 	}
+
+	// CREATE a new country name and code
+	[HttpPost]
+	public ActionResult<Country> Create([FromBody]Country country)
+	{
+		if (!ModelState.IsValid) return BadRequest(ModelState);
+
+		if (_service.GetByName(country.Name!) != null)
+			return Conflict("Country already exist!");
+		
+		var newCountry = _service.CreateCountry(country);
+		return CreatedAtAction(nameof(GetByName), new { name = newCountry.Name }, newCountry);
+	}
+
+	// UPDATE a country WB rate
+	[HttpPut("{code}")]
+	public ActionResult<InternetStatistic> UpdateWBRate(string code, [FromBody]decimal newRate)
+	{
+        try
+        {
+            var updated = _service.UpdateWBRate(code, newRate);
+            if (updated == null) return NotFound("Statistic not found.");
+
+            return Ok(updated);
+        }
+        catch (ArgumentException ex)
+        {
+            // Invalid input (rate out of range)
+            return BadRequest(ex.Message);
+        }
+    }
 }
