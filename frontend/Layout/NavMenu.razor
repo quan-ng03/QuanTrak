@@ -1,33 +1,48 @@
 ﻿@inject IJSRuntime jsRuntime
 
-<div class="d-flex flex-column" style="height: 100vh;">
+
+<div class="sidebar-content d-flex flex-column" style="height: 100vh;">
+    <!-- Top Row-->
     <div class="top-row ps-3 navbar navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="Home">QuanTrak</a>
-            <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+        <div class="container-fluid ">
+            <a class="navbar-brand custom-brand " href="">QuanTrak</a>
+            <div class="d-flex align-items-center">
+                <button class="theme-toggle-button btn btn-secondary d-md-none me-2" style="width:70px;"
+                        @onclick="ToggleTheme"
+                        title="Switch theme">
+                    <i class=" @(isDarkMode ? "bi-sun-fill" : "bi-moon-fill")"></i>
+                </button>
+                <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
         </div>
     </div>
 
-    <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
+    <!-- Middle -->
+    <div class="@NavMenuCssClass  flex-grow-1">
         <nav class="flex-column">
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="CountryLeague">
-                    <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Country League Table
+                    <span class="bi bi-globe-nav-menu" aria-hidden="true"></span>
+                    Country League Table
                 </NavLink>
             </div>
             <div class="nav-item px-3">
                 <NavLink class="nav-link" href="CountrySummary">
-                    <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Country Summary
+                    <span class="bi bi-bar-chart-line-fill-nav-menu" aria-hidden="true"></span>
+                    Country Summary
                 </NavLink>
             </div>
         </nav>
     </div>
 
-    <div class="mt-auto p-3">
-        <button class="btn btn-secondary w-100" @onclick="ToggleTheme">
-            Switch to @(isDarkMode ? "Light" : "Dark") Mode
+    <!-- Bottom -->
+    <div class="theme-toggle-wrapper text-center mb-5 d-none d-md-block">
+        <button class="theme-toggle-button btn btn-secondary"
+                style="width: 150px;"
+                @onclick="ToggleTheme">
+            <i class="@(isDarkMode ? "bi-sun-fill" : "bi-moon-fill")"></i>
         </button>
     </div>
 </div>
@@ -36,18 +51,32 @@
     private bool collapseNavMenu = true;
     private bool isDarkMode = false;
 
-    // The "collapse" class is added when the nav is collapsed.
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
 
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
     private async Task ToggleTheme()
     {
-        // Toggle the theme flag.
         isDarkMode = !isDarkMode;
-        // Determine which CSS class to apply.
+        await SetTheme();
+        StateHasChanged();
+    }
+
+    private async Task SetTheme()
+    {
         var themeClass = isDarkMode ? "dark-mode" : "light-mode";
-        // Use JS interop to update the <body> class (or you could update a shared state).
         await jsRuntime.InvokeVoidAsync("setBodyClass", themeClass);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var currentHour = DateTime.Now.Hour;
+            // Set light mode if between 8 AM and 6 PM, else dark mode.
+            isDarkMode = (currentHour < 8 || currentHour >= 18);
+            await SetTheme();
+            StateHasChanged();
+        }
     }
 }

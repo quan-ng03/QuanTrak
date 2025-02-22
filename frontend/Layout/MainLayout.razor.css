@@ -9,8 +9,13 @@ main {
 }
 
 .sidebar {
-    background-image: linear-gradient(180deg, rgb(5, 39, 103) 0%, #3a0647 70%);
+    background-image: linear-gradient(0deg, #F2F2F2 20%, #4A5A72 50%, #3D4A5D 60%);
 }
+
+body.dark-mode .sidebar {
+    background-image: linear-gradient(0deg, #141414 20%, #272D36 40%, #3D4A5D 50%);
+}
+
 
 .top-row {
     background-color: #f7f7f7;
@@ -74,4 +79,5 @@ main {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
     }
+    
 }
