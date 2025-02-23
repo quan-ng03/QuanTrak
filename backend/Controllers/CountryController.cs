@@ -1,6 +1,7 @@
 using backend.Services;
 using backend.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace backend.Controllers;
 
@@ -22,8 +23,23 @@ public class CountryController : ControllerBase
 		return _service.GetAll();
 	}
 
-	// GET a certain country
-	[HttpGet("{name}")]
+	// GET all countries WB data
+	[HttpGet("details")]
+	public IEnumerable<Country> GetContriesDetails()
+	{
+		return _service.GetCountriesDetails();
+	}
+
+    // GET top 10 countires WB rate
+    [HttpGet("top10")]
+    public IEnumerable<Country> GetTop10Countries()
+    {
+		return _service.GetTop10Countries();
+    }
+
+
+    // GET a certain country
+    [HttpGet("{name}")]
 	public ActionResult<Country> GetByName(string name)
 	{
 		var country = _service.GetByName(name);
