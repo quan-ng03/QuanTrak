@@ -112,6 +112,35 @@ body.dark-mode {
     color: #f1f1f1;
 }
 
+body.dark-mode .table {
+    color: #f1f1f1 !important;
+    background-color: #141414;
+}
+
+body.light-mode .table {
+    color: #141414 !important;
+    background-color: #ffffff;
+}
+
+/* Optional: Adjust table borders if needed */
+body.dark-mode .theme-adjusted-table table {
+    border-color: #444;
+}
+
+body.light-mode .theme-adjusted-table table {
+    border-color: #ccc;
+}
+
+body.dark-mode .mud-chart-legend,
+body.dark-mode .mud-chart-legend * {
+    color: #f1f1f1 !important; 
+}
+
+body.light-mode .mud-chart-legend,
+body.light-mode .mud-chart-legend * {
+    color: #212529 !important;
+}
+
 .staatliches-regular {
     font-family: "Staatliches", serif;
     font-weight: 400;

@@ -9,30 +9,43 @@
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Country</th>
-                <th>WB Rate</th>
-                <th>WB Year</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var country in countries)
-            {
-                var wbData = country.InternetStatistics?.FirstOrDefault();
+    <div class="table-container " style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 1rem;">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@country.Name</td>
-                    <td>@(wbData?.PercentWB?.ToString("0.##") ?? "N/A")</td>
-                    <td>@(wbData?.YearWB?.ToString() ?? "N/A")</td>
+                    <th>Country</th>
+                    <th>WB Rate</th>
+                    <th>WB Year</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var country in countries)
+                {
+                    var wbData = country.InternetStatistics?.FirstOrDefault();
+                    <tr>
+                        <td>@country.Name</td>
+                        <td>@(wbData?.PercentWB?.ToString("0.##") ?? "N/A")</td>
+                        <td>@(wbData?.YearWB?.ToString() ?? "N/A")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    
 
     <h4>Top 10 Countries by WB Rate</h4>
-    <!-- The PieChart component should accept Data and Labels as parameters -->
-    <PieChart Data="pieChartData" Labels="pieChartLabels" />
+    <!-- MudChart Pie Chart -->
+    @if (pieData.Length > 0 && pieLabels.Length > 0)
+    {
+
+        <MudPaper Class="pa-4" Elevation="0" Style="background-color: transparent;">
+            <MudChart ChartType="ChartType.Pie" InputData="@pieData" InputLabels="@pieLabels" Width="300px" Height="300px" />
+        </MudPaper>
+    }
+    
+
+
 }
 
 @code {
@@ -41,11 +54,13 @@ else
     private List<decimal> pieChartData = new();
     private List<string> pieChartLabels = new();
 
+    private double[] pieData = Array.Empty<double>();
+    private string[] pieLabels = Array.Empty<string>();
+
     protected override async Task OnInitializedAsync()
     {
-        // Get all countries details sorted by WB rate (if not sorted by API, sort here)
         countries = await CountryService.GetCountriesDetailsAsync();
-        countries = countries?.OrderByDescending(c => c.InternetStatistics?.FirstOrDefault()?.PercentWB).ToList();
+        countries = countries?.ToList();
 
         // Get top 10 countries for the pie chart
         top10Countries = await CountryService.GetTop10CountriesAsync();
@@ -57,6 +72,9 @@ else
                 pieChartLabels.Add(country.Name);
                 pieChartData.Add(wbData?.PercentWB ?? 0);
             }
+            // Convert lists to arrays for MudChart.
+            pieData = pieChartData.Select(x => (double)x).ToArray();
+            pieLabels = pieChartLabels.ToArray();
         }
     }
 }

@@ -34,5 +34,19 @@ public class CountryService
     {
         return await _httpClient.GetFromJsonAsync<Country>($"api/Country/{name}");
     }
+
+    public async Task<InternetStatistic> UpdateWBRateAsync(string code, decimal newRate)
+    {
+        var response = await _httpClient.PutAsJsonAsync($"api/country/{code}", newRate);
+        if (response.IsSuccessStatusCode)
+        {
+            return await response.Content.ReadFromJsonAsync<InternetStatistic>();
+        }
+        else
+        {
+            var error = await response.Content.ReadAsStringAsync();
+            throw new Exception(error);
+        }
+    }
 }
 

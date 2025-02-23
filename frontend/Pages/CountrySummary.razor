@@ -16,7 +16,7 @@
 
 @if (selectedCountry != null)
 {
-    <h4>@selectedCountry.Name</h4>
+    <h4 class="mt-4">@selectedCountry.Name</h4>
     <table class="table">
         <tbody>
             <tr>
@@ -53,11 +53,26 @@
             }
         </tbody>
     </table>
+
+    <h4>Update WB Rate</h4>
+    <EditForm Model="updateModel" OnValidSubmit="UpdateRate">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label class="form-label">New WB Rate (0,100):</label>
+            <InputNumber @bind-Value="updateModel.NewRate" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary" style="background-color:#3D4A5D; border:transparent">Update</button>
+    </EditForm>
 }
 
 @code {
     private List<string>? countryNames;
     private Country? selectedCountry;
+    private string errorMessage = string.Empty;
+
+    private UpdateModel updateModel = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -76,5 +91,35 @@
         {
             selectedCountry = null;
         }
+    }
+
+    private async Task UpdateRate()
+    {
+        errorMessage = string.Empty;
+
+        if (updateModel.NewRate < 0 || updateModel.NewRate > 100)
+        {
+            errorMessage = "Rate must be between 0 and 100.";
+            return;
+        }
+
+        try
+        {
+            var updatedStatistic = await CountryService.UpdateWBRateAsync(selectedCountry!.Code!, updateModel.NewRate.Value);
+
+            selectedCountry = await CountryService.GetCountryByNameAsync(selectedCountry.Name!);
+
+            updateModel.NewRate = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Update failed: {ex.Message}";
+        }
+    }
+
+    public class UpdateModel
+    {
+        [Range(0, 100, ErrorMessage = "Rate must be between 0 and 100.")]
+        public decimal? NewRate { get; set; }
     }
 }
