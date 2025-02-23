@@ -2,7 +2,6 @@ namespace backend.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
-using Microsoft.OpenApi.Models;
 
 public class InternetStatistic
 {

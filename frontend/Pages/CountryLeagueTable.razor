@@ -1,19 +1,62 @@
-﻿@page "/CountryLeague"
-@inject HttpClient Http
+﻿@page "/country-league"
+@inject CountryService CountryService
 
-<PageTitle>Country League Table</PageTitle>
+<h3>Country League Table</h3>
 
-<h1>Counter</h1>
+@if (countries == null)
+{
+    <p><em>Loading countries...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>WB Rate</th>
+                <th>WB Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var country in countries)
+            {
+                var wbData = country.InternetStatistics?.FirstOrDefault();
+                <tr>
+                    <td>@country.Name</td>
+                    <td>@(wbData?.PercentWB?.ToString("0.##") ?? "N/A")</td>
+                    <td>@(wbData?.YearWB?.ToString() ?? "N/A")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<p role="status">Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    <h4>Top 10 Countries by WB Rate</h4>
+    <!-- The PieChart component should accept Data and Labels as parameters -->
+    <PieChart Data="pieChartData" Labels="pieChartLabels" />
+}
 
 @code {
-    private int currentCount = 0;
+    private List<Country>? countries;
+    private List<Country>? top10Countries;
+    private List<decimal> pieChartData = new();
+    private List<string> pieChartLabels = new();
 
-    private void IncrementCount()
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        // Get all countries details sorted by WB rate (if not sorted by API, sort here)
+        countries = await CountryService.GetCountriesDetailsAsync();
+        countries = countries?.OrderByDescending(c => c.InternetStatistics?.FirstOrDefault()?.PercentWB).ToList();
+
+        // Get top 10 countries for the pie chart
+        top10Countries = await CountryService.GetTop10CountriesAsync();
+        if (top10Countries != null)
+        {
+            foreach (var country in top10Countries)
+            {
+                var wbData = country.InternetStatistics?.FirstOrDefault();
+                pieChartLabels.Add(country.Name);
+                pieChartData.Add(wbData?.PercentWB ?? 0);
+            }
+        }
     }
 }

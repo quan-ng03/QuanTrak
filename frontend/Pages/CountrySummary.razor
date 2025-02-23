@@ -1,35 +1,54 @@
-﻿@page "/CountrySummary"
-@inject HttpClient Http
+﻿@page "/country-summary"
+@inject CountryService CountryService
 
-<PageTitle>Country Summary</PageTitle>
+<h3>Country Summary</h3>
 
-<h1>Select Country to Track</h1>
+<select class="form-select" @onchange="OnCountrySelected">
+    <option value="">-- Select a Country --</option>
+    @if (countryNames != null)
+    {
+        @foreach (var name in countryNames)
+        {
+            <option value="@name">@name</option>
+        }
+    }
+</select>
 
-<p>This component demonstrates fetching data from the server.</p>
-
-@if (forecasts == null)
+@if (selectedCountry != null)
 {
-    <p><em>Loading...</em></p>
-}
-else
-{
+    <h4>@selectedCountry.Name</h4>
     <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
         <tbody>
-            @foreach (var forecast in forecasts)
+            <tr>
+                <th>Country Code</th>
+                <td>@selectedCountry.Code</td>
+            </tr>
+            @if (selectedCountry.InternetStatistics != null && selectedCountry.InternetStatistics.Any())
             {
+                var stat = selectedCountry.InternetStatistics.FirstOrDefault();
                 <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
+                    <th>WB Rate</th>
+                    <td>@(stat?.PercentWB?.ToString("0.##") ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>WB Year</th>
+                    <td>@(stat?.YearWB?.ToString() ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>ITU Rate</th>
+                    <td>@(stat?.PercentITU?.ToString("0.##") ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>ITU Year</th>
+                    <td>@(stat?.YearITU?.ToString() ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>CIA Population</th>
+                    <td>@(stat?.PopulationCIA?.ToString() ?? "N/A")</td>
+                </tr>
+                <tr>
+                    <th>CIA Year</th>
+                    <td>@(stat?.YearCIA?.ToString() ?? "N/A")</td>
                 </tr>
             }
         </tbody>
@@ -37,21 +56,25 @@ else
 }
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private List<string>? countryNames;
+    private Country? selectedCountry;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("sample-data/weather.json");
+        // Load the list of country names for the dropdown
+        countryNames = await CountryService.GetCountryNamesAsync();
     }
 
-    public class WeatherForecast
+    private async Task OnCountrySelected(ChangeEventArgs e)
     {
-        public DateOnly Date { get; set; }
-
-        public int TemperatureC { get; set; }
-
-        public string? Summary { get; set; }
-
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        var selectedName = e.Value?.ToString();
+        if (!string.IsNullOrWhiteSpace(selectedName))
+        {
+            selectedCountry = await CountryService.GetCountryByNameAsync(selectedName);
+        }
+        else
+        {
+            selectedCountry = null;
+        }
     }
 }
