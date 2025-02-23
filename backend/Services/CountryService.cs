@@ -1,6 +1,7 @@
 ﻿using backend.Models;
 using backend.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace backend.Services;
 
@@ -20,6 +21,28 @@ public class CountryService
 			.Select(p => p.Name!)
 			.AsNoTracking()
 			.ToList();
+	}
+
+	// Return all countries WB data sorted by rate
+	public IEnumerable<Country> GetCountriesDetails()
+	{
+		var countries = _context.Countries
+			.Include(c => c.InternetStatistics)
+			.AsNoTracking()
+			.OrderByDescending(c => c.InternetStatistics.FirstOrDefault().PercentWB)
+			.ToList();
+		return countries;
+	}
+
+	public IEnumerable<Country> GetTop10Countries ()
+	{
+		var topCountries = _context.Countries
+            .Include(c => c.InternetStatistics)
+            .AsNoTracking()
+            .OrderByDescending(c => c.InternetStatistics.FirstOrDefault().PercentWB)
+            .Take(10)
+            .ToList();
+        return topCountries;
 	}
 
 	// Return a country's internet statistics
