@@ -141,8 +141,87 @@ body.light-mode .mud-chart-legend * {
     color: #212529 !important;
 }
 
+body.light-mode .home-custom-brand {
+    color: #141414 !important;
+}
+
+body.dark-mode .home-custom-brand {
+
+    color: #ffffff !important;
+}
+
+body.light-mode home-animate-sentence {
+    color: #141414 !important;
+}
+body.dark-mode home-animate-sentence {
+    color: #f1f1f1 !important;
+}
 .staatliches-regular {
     font-family: "Staatliches", serif;
     font-weight: 400;
     font-style: normal;
+}
+
+
+.custom-brand {
+    font-family: "Staatliches", serif;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #ffffff !important;
+    text-decoration: underline;
+    text-decoration-color: #00BE35;
+    text-underline-offset: 5px;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-out;
+}
+
+
+@media (max-width: 767.98px) {
+    .welcome-sentence {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 3.5rem;
+    }
+    .home-custom-brand {
+        font-family: "Staatliches", serif;
+        font-size: 3rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #141414 !important;
+        text-decoration: underline;
+        text-decoration-color: #00BE35;
+        text-underline-offset: 10px;
+    }
+}
+
+@media (min-width: 768px) {
+    .welcome-sentence {
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 6rem;
+    }
+
+    .home-custom-brand {
+        font-family: "Staatliches", serif;
+        font-size: 6rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: #141414 !important;
+        text-decoration: underline;
+        text-decoration-color: #00BE35;
+        text-underline-offset: 10px;
+    }
 }

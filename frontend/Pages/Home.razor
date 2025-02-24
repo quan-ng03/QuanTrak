@@ -1,8 +1,125 @@
 @page "/"
-
+@inject HttpClient Http
+@inject CountryService CountryService
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
+<h1 class="welcome-sentence">
+    Welcome to <a class="home-custom-brand" href="">QuanTrak</a>, where hosted most up-to-date Country's Internet Usage
+</h1>
+
+@if (currentCountry == null)
+{
+    <MudText>Loading data...</MudText>
+}
+else
+{
+    <div class="pa-4 mb-4 mt-10" style="background-color: transparent; text-align:left">
+        <MudText Class="home-animate-sentence" Typo="Typo.h4">
+            <span class="slide-in" 
+                  style="display: inline-block; text-align:left"
+                  id="countryName">
+                @currentCountry.Name
+            </span>
+            <br />
+            has population of 
+            <span class="slide-in"
+                  style="display: inline-block; width: 200px; text-align:left"
+                  id="populationValue">
+                @currentPopulationFormatted
+            </span>
+            <br />
+            and
+            <span class="slide-in"
+                  style="display: inline-block; width: 100px; text-align:center"
+                  id="percentageValue">
+                @selectedPercentageFormatted%
+            </span>
+             of the population is using the internet.
+        </MudText>
+    </div>
+}
 
 @code {
-    
+    private bool isMediumOrSmaller;
+    private List<Country> countries = new();
+
+    // The country currently displayed in the header.
+    private Country? currentCountry;
+    private int currentIndex = 0;
+    private string currentPopulationFormatted = "";
+    private string selectedPercentageFormatted = "";
+
+    // Timer to update the header every 5 seconds.
+    private Timer? timer;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        countries = await CountryService.GetCountriesDetailsAsync() ?? new List<Country>();
+
+        if (countries.Any())
+        {
+            currentCountry = countries[currentIndex];
+            UpdateCurrentCountryDisplay();
+
+            // Start a timer to update the header every 5 seconds
+            timer = new Timer(UpdateCountry, null, 5000, 5000);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Re-trigger the animation for each element after rendering.
+        await JSRuntime.InvokeVoidAsync("reanimateElement", "countryName");
+        await JSRuntime.InvokeVoidAsync("reanimateElement", "populationValue");
+        await JSRuntime.InvokeVoidAsync("reanimateElement", "percentageValue");
+    }
+
+    private void UpdateCountry(object? state)
+    {
+        if (countries.Count == 0)
+            return;
+
+        // Rotate through the list.
+        currentIndex = (currentIndex + 1) % countries.Count;
+        currentCountry = countries[currentIndex];
+        UpdateCurrentCountryDisplay();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateCurrentCountryDisplay()
+    {
+        if (currentCountry == null)
+            return;
+
+        var stat = currentCountry.InternetStatistics?.FirstOrDefault();
+
+        currentPopulationFormatted = stat?.PopulationCIA.HasValue == true
+            ? stat!.PopulationCIA.Value.ToString("N0")
+            : "N/A";
+
+        // Use the percentage (WB or ITU) whose year is closer to YearCIA
+        decimal? selectedPercentage = null;
+        if (stat != null && stat.YearCIA.HasValue)
+        {
+            if (stat.YearWB.HasValue && stat.YearITU.HasValue)
+            {
+                int diffWB = Math.Abs(stat.YearCIA.Value - stat.YearWB.Value);
+                int diffITU = Math.Abs(stat.YearCIA.Value - stat.YearITU.Value);
+                selectedPercentage = diffWB <= diffITU ? stat.PercentWB : stat.PercentITU;
+            }
+            else if (stat.PercentWB.HasValue)
+            {
+                selectedPercentage = stat.PercentWB;
+            }
+            else if (stat.PercentITU.HasValue)
+            {
+                selectedPercentage = stat.PercentITU;
+            }
+        }
+        selectedPercentageFormatted = selectedPercentage?.ToString("0.##") ?? "N/A";
+    }
 }

@@ -12,6 +12,8 @@ namespace frontend.Models
         [MaxLength(100)]
         public string? Name { get; set; }
 
+        [Required]
+        public string? Region { get; set; }
         public List<InternetStatistic>? InternetStatistics { get; set; } // One-to-many
 
     }

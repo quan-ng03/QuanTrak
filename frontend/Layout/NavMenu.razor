@@ -1,13 +1,13 @@
 ﻿@inject IJSRuntime jsRuntime
 
 
-<div class="sidebar-content d-flex flex-column" style="height: 100vh;">
+<div class="sidebar-content d-flex flex-column">
     <!-- Top Row-->
     <div class="top-row ps-3 navbar navbar-dark">
         <div class="container-fluid ">
-            <a class="navbar-brand custom-brand " href="">QuanTrak</a>
+            <a class=" custom-brand " href="">QuanTrak</a>
             <div class="d-flex align-items-center">
-                <button class="theme-toggle-button btn btn-secondary d-md-none me-2" style="width:70px;"
+                <button class="theme-toggle-button btn btn-secondary me-2" style="width:70px;"
                         @onclick="ToggleTheme"
                         title="Switch theme">
                     <i class=" @(isDarkMode ? "bi-sun-fill" : "bi-moon-fill")"></i>
@@ -38,8 +38,8 @@
     </div>
 
     <!-- Bottom -->
-    <div class="theme-toggle-wrapper text-center mb-5 d-none d-md-block">
-        <button class="theme-toggle-button btn btn-secondary"
+    <div class="theme-toggle-wrapper text-center mb-5">
+        <button class="theme-toggle-button-lg btn btn-secondary"
                 style="width: 150px;"
                 @onclick="ToggleTheme">
             <i class="@(isDarkMode ? "bi-sun-fill" : "bi-moon-fill")"></i>

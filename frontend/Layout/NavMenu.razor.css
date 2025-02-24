@@ -60,7 +60,18 @@
     color: white;
 }
 
-@media (min-width: 641px) {
+
+@media (max-width: 767.98px) {
+    .theme-toggle-button-lg{
+        display:none;
+    }
+}
+
+@media (min-width: 768px) {
+    .theme-toggle-button {
+        display: none;
+    }
+
     .navbar-toggler {
         display: none;
     }
@@ -69,17 +80,25 @@
         /* Never collapse the sidebar for wide screens */
         display: block;
     }
-    
+
     .nav-scrollable {
         /* Allow sidebar to scroll for tall menus */
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
     }
+
+    .sidebar-content {
+        height: 100vh;
+    }
+
+    .custom-brand {
+        margin-top: 10px;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 
-
-
-/* Override button styles within each theme */
 body.dark-mode .theme-toggle-button {
     background-color: #F2F2F2;
     color: #000000;
@@ -92,25 +111,14 @@ body.light-mode .theme-toggle-button {
     border-color: transparent;
 }
 
-
-
-.custom-brand {
-    font-family: "Staatliches", serif;
-    font-size: 2.5rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: #ffffff !important;
-    text-decoration: underline;
-    text-decoration-color: #00BE35;
-    text-underline-offset: 5px;
-    
+body.dark-mode .theme-toggle-button-lg {
+    background-color: #F2F2F2;
+    color: #000000;
+    border-color: transparent;
 }
 
-@media (min-width: 641px) {
-    .custom-brand {
-        margin-top: 10px;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+body.light-mode .theme-toggle-button-lg {
+    background-color: #141414;
+    color: #f1f1f1;
+    border-color: transparent;
 }

@@ -29,6 +29,12 @@ public class CountryService
         return await _httpClient.GetFromJsonAsync<List<string>>("api/Country");
     }
 
+    // Gets countries by region from the backend.
+    public async Task<List<Country>> GetCountriesByRegionAsync(string region)
+    {
+        return await _httpClient.GetFromJsonAsync<List<Country>>($"api/Country/region/{region}");
+    }
+
     // Gets detailed summary for a given country
     public async Task<Country> GetCountryByNameAsync(string name)
     {
