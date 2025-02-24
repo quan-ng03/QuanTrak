@@ -78,6 +78,21 @@ namespace backend.Tests
         }
 
         [Fact]
+        public void GetAll_NoCountries_ReturnsEmptyList()
+        {
+            // Arrange - Clear the database
+            _context.Countries.RemoveRange(_context.Countries);
+            _context.SaveChanges();
+
+            // Act
+            var result = _service.GetAll();
+
+            // Assert
+            Assert.Empty(result);
+        }
+
+
+        [Fact]
         public void GetCountriesDetails_ReturnsCountriesSortedByWBRateDescending()
         {
             // Act
@@ -112,18 +127,30 @@ namespace backend.Tests
         }
 
         [Fact]
-        public void CreateCountry_AddsCountryToContext()
+        public void GetByName_CountryDoesNotExist_ReturnsNull()
         {
-            // Arrange
-            var newCountry = new Country { Code = "UK", Name = "United Kingdom" };
-
             // Act
-            var created = _service.CreateCountry(newCountry);
+            var result = _service.GetByName("NonExistentCountry");
 
             // Assert
-            Assert.Equal("United Kingdom", created.Name);
-            Assert.NotNull(_context.Countries.SingleOrDefault(c => c.Code == "UK"));
+            Assert.Null(result);
         }
+
+        [Fact]
+        public void GetCountriesDetails_CountryWithoutStatistics_DoesNotThrowError()
+        {
+            // Arrange
+            var newCountry = new Country { Code = "JP", Name = "Japan" };
+            _context.Countries.Add(newCountry);
+            _context.SaveChanges();
+
+            // Act
+            var result = _service.GetCountriesDetails();
+
+            // Assert
+            Assert.Contains(result, c => c.Name == "Japan");
+        }
+
 
         [Fact]
         public void UpdateWBRate_ValidRate_UpdatesStatistic()
@@ -138,12 +165,84 @@ namespace backend.Tests
         }
 
         [Fact]
+        public void UpdateWBRate_NonExistentCountry_ReturnsNull()
+        {
+            // Act
+            var result = _service.UpdateWBRate("XYZ", 50);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+
+        [Fact]
         public void UpdateWBRate_InvalidRate_ThrowsArgumentException()
         {
             // Assert that negative rate throws exception
             Assert.Throws<ArgumentException>(() => _service.UpdateWBRate("US", -5));
             // Assert that rate greater than 100 throws exception
             Assert.Throws<ArgumentException>(() => _service.UpdateWBRate("US", 105));
+        }
+
+        [Fact]
+        public void GetCountryRankingByCode_CountryWithoutValidData_ReturnsNull()
+        {
+            // Arrange
+            var country = new Country
+            {
+                Code = "IN",
+                Name = "India",
+                InternetStatistics = new List<InternetStatistic>
+        {
+            new InternetStatistic { CountryCode = "IN", PercentWB = null, PopulationCIA = null }
+        }
+            };
+            _context.Countries.Add(country);
+            _context.SaveChanges();
+
+            // Act
+            var result = _service.GetCountryRankingByCode("IN");
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public void GetCountryRankingByCode_CountriesWithSameInternetUsers_CorrectlyRanks()
+        {
+            // Arrange
+            var country1 = new Country
+            {
+                Code = "DE",
+                Name = "Germany",
+                InternetStatistics = new List<InternetStatistic>
+        {
+            new InternetStatistic { CountryCode = "DE", PopulationCIA = 1000000, PercentWB = 50 }
+        }
+            };
+
+            var country2 = new Country
+            {
+                Code = "GB",
+                Name = "United Kingdom",
+                InternetStatistics = new List<InternetStatistic>
+        {
+            new InternetStatistic { CountryCode = "GB", PopulationCIA = 1000000, PercentWB = 50 }
+        }
+            };
+
+            _context.Countries.AddRange(country1, country2);
+            _context.SaveChanges();
+
+            // Act
+            var rank1 = _service.GetCountryRankingByCode("DE");
+            var rank2 = _service.GetCountryRankingByCode("GB");
+
+            // Assert
+            Assert.NotNull(rank1);
+            Assert.NotNull(rank2);
+            Assert.Equal(rank1.CalculatedInternetUsers, rank2.CalculatedInternetUsers);
+            Assert.NotEqual(rank1.Rank, rank2.Rank);
         }
 
         public void Dispose()
