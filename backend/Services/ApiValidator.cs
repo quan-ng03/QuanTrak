@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace backend.Services;
 
+// API Key Authenticator Service Class to check with the saved key in docker env
+
 public class ApiValidator
 {
     public string ApiKey { get; }

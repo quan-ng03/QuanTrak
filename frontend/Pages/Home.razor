@@ -5,7 +5,7 @@
 
 <PageTitle>Home</PageTitle>
 <h1 class="welcome-sentence">
-    Welcome to <a class="home-custom-brand" href="">QuanTrak</a>, where hosted most up-to-date Country's Internet Usage
+    Welcome to <a class="home-custom-brand" href="">QuanTrak</a>, hosting the most up-to-date Country's Internet Usage.
 </h1>
 
 @if (currentCountry == null)
@@ -16,33 +16,51 @@ else
 {
     <div class="pa-4 mb-4 mt-10" style="background-color: transparent; text-align:left">
         <MudText Class="home-animate-sentence" Typo="Typo.h4">
-            <span class="slide-in" 
-                  style="display: inline-block; text-align:left"
+            <span class="slide-in running-text" 
+                  style="display: inline-block; text-align:left; font-size:2em"
                   id="countryName">
                 @currentCountry.Name
             </span>
             <br />
-            has population of 
-            <span class="slide-in"
+            has population of
+            <span class="slide-in running-text"
                   style="display: inline-block; width: 200px; text-align:left"
                   id="populationValue">
                 @currentPopulationFormatted
             </span>
             <br />
             and
-            <span class="slide-in"
+            <span class="slide-in running-text"
                   style="display: inline-block; width: 100px; text-align:center"
                   id="percentageValue">
                 @selectedPercentageFormatted%
             </span>
              of the population is using the internet.
+             <br />
+            Ranking
+            <span class="slide-in rank-value"
+                  style="display: inline-block; width: 140px; text-align:center"
+                  id="rankValue">
+                @(ranking.Rank)@(GetOrdinalSuffix(ranking.Rank))
+            </span>
+            <br />
+            in the list of
+            <span>
+                @totalEligibleCountries
+            </span>
+            countries.
         </MudText>
     </div>
 }
 
+
+
 @code {
+    // General instantiation
     private bool isMediumOrSmaller;
     private List<Country> countries = new();
+    private CountryRankDTO? ranking;
+    private int totalEligibleCountries = 0;
 
     // The country currently displayed in the header.
     private Country? currentCountry;
@@ -57,14 +75,21 @@ else
     protected override async Task OnInitializedAsync()
     {
         countries = await CountryService.GetCountriesDetailsAsync() ?? new List<Country>();
+        totalEligibleCountries = countries.Count(c =>
+            c.InternetStatistics?.Any(s =>
+            s.PopulationCIA.HasValue &&
+            (s.PercentWB.HasValue || s.PercentITU.HasValue)) ?? false);
 
         if (countries.Any())
         {
             currentCountry = countries[currentIndex];
-            UpdateCurrentCountryDisplay();
+            await UpdateCurrentCountryDisplayAsync();
 
-            // Start a timer to update the header every 5 seconds
-            timer = new Timer(UpdateCountry, null, 5000, 5000);
+            // Start a timer to update the header every 7 seconds
+            timer = new Timer(async _ =>
+            {
+                await InvokeAsync(UpdateCountryAsync);
+            }, null, 5000, 5000);
         }
 
         await InvokeAsync(StateHasChanged);
@@ -72,13 +97,15 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        // Re-trigger the animation for each element after rendering.
+        
+        // Trigger the animation for each element after rendering.
         await JSRuntime.InvokeVoidAsync("reanimateElement", "countryName");
         await JSRuntime.InvokeVoidAsync("reanimateElement", "populationValue");
         await JSRuntime.InvokeVoidAsync("reanimateElement", "percentageValue");
+        await JSRuntime.InvokeVoidAsync("reanimateElement", "rankValue");
     }
 
-    private void UpdateCountry(object? state)
+    private async Task UpdateCountryAsync()
     {
         if (countries.Count == 0)
             return;
@@ -86,24 +113,31 @@ else
         // Rotate through the list.
         currentIndex = (currentIndex + 1) % countries.Count;
         currentCountry = countries[currentIndex];
-        UpdateCurrentCountryDisplay();
-        InvokeAsync(StateHasChanged);
+        await UpdateCurrentCountryDisplayAsync();
+        await InvokeAsync(StateHasChanged);
     }
 
-    private void UpdateCurrentCountryDisplay()
+    private async Task UpdateCurrentCountryDisplayAsync()
     {
         if (currentCountry == null)
             return;
 
         var stat = currentCountry.InternetStatistics?.FirstOrDefault();
+        if (stat == null)
+        {
+            currentPopulationFormatted = "N/A";
+            selectedPercentageFormatted = "N/A";
+            ranking = null;
+            return;
+        }
 
-        currentPopulationFormatted = stat?.PopulationCIA.HasValue == true
-            ? stat!.PopulationCIA.Value.ToString("N0")
+        currentPopulationFormatted = stat.PopulationCIA.HasValue
+            ? stat.PopulationCIA.Value.ToString("N0")
             : "N/A";
 
-        // Use the percentage (WB or ITU) whose year is closer to YearCIA
+        // Choose the percentage (WB or ITU) whose year is closer to YearCIA.
         decimal? selectedPercentage = null;
-        if (stat != null && stat.YearCIA.HasValue)
+        if (stat.YearCIA.HasValue)
         {
             if (stat.YearWB.HasValue && stat.YearITU.HasValue)
             {
@@ -121,5 +155,45 @@ else
             }
         }
         selectedPercentageFormatted = selectedPercentage?.ToString("0.##") ?? "N/A";
+
+        // If we have valid population and percentage data, retrieve the ranking.
+        if (stat.PopulationCIA.HasValue && selectedPercentage.HasValue)
+        {
+            ranking = await CountryService.GetCountryRankingAsync(currentCountry.Code!);
+        }
+        else
+        {
+            ranking = null;
+        }
+    }
+
+    private string GetOrdinalSuffix(int rank)
+    {
+        if (rank % 100 >= 11 && rank % 100 <= 13)
+        {
+            return "th";
+        }
+        int lastDigit = rank % 10;
+        if (lastDigit == 1)
+        {
+            return "st";
+        }
+        else if (lastDigit == 2)
+        {
+            return "nd";
+        }
+        else if (lastDigit == 3)
+        {
+            return "rd";
+        }
+        else
+        {
+            return "th";
+        }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
     }
 }
