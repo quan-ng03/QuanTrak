@@ -54,5 +54,11 @@ public class CountryService
             throw new Exception(error);
         }
     }
+
+    public async Task<CountryRankDTO> GetCountryRankingAsync(string code)
+    {
+        return await _httpClient.GetFromJsonAsync<CountryRankDTO>($"api/Country/ranking/{code}");
+    }
+
 }
 

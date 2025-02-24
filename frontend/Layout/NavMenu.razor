@@ -55,6 +55,7 @@
 
     private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 
+    // Async call each team user click Theme Button, retrieve the theme, and re-render the page.
     private async Task ToggleTheme()
     {
         isDarkMode = !isDarkMode;
@@ -62,12 +63,14 @@
         StateHasChanged();
     }
 
+    // Return the theme result.
     private async Task SetTheme()
     {
         var themeClass = isDarkMode ? "dark-mode" : "light-mode";
         await jsRuntime.InvokeVoidAsync("setBodyClass", themeClass);
     }
 
+    // Intial theme for page based on user local time.
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)

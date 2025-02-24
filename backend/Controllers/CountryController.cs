@@ -45,25 +45,12 @@ public class CountryController : ControllerBase
 		var country = _service.GetByName(name);
 		if (country is not null)
 		{
-			return country;
+			return Ok(country);
 		}
 		else
 		{
 			return NotFound();
 		}
-	}
-
-	// CREATE a new country name and code
-	[HttpPost]
-	public ActionResult<Country> Create([FromBody]Country country)
-	{
-		if (!ModelState.IsValid) return BadRequest(ModelState);
-
-		if (_service.GetByName(country.Name!) != null)
-			return Conflict("Country already exist!");
-		
-		var newCountry = _service.CreateCountry(country);
-		return CreatedAtAction(nameof(GetByName), new { name = newCountry.Name }, newCountry);
 	}
 
 	// UPDATE a country WB rate
@@ -82,5 +69,17 @@ public class CountryController : ControllerBase
             // Invalid input (rate out of range)
             return BadRequest(ex.Message);
         }
+    }
+
+    // GET the ranking of a country
+    [HttpGet("ranking/{code}")]
+    public IActionResult GetCountryRanking(string code)
+    {
+        var rankingDto = _service.GetCountryRankingByCode(code);
+        if (rankingDto == null)
+        {
+            return NotFound($"Country with code {code} not found or insufficient data.");
+        }
+        return Ok(rankingDto);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using backend.Data;
 
+// Class for calling the function DbInitializer for better code clarity
 public static class Extensions
 {
 	public static void CreateDbIfNotExists(this IHost host)

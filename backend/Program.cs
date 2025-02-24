@@ -49,11 +49,13 @@ builder.Services.AddDbContext<CountryContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddScoped<CountryService>();
 
-// API Key
+// API Key load into the program
 string? apiKey = builder.Configuration["API_KEY"];
 builder.Services.AddSingleton(new ApiValidator(apiKey));
 
 
+
+// Start build process
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -65,12 +67,14 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowBlazorClient");
 app.UseRouting();
 
+// *MUST* be stored before MapControllers or else it cannot check the call events
 app.UseMiddleware<ApiKeyMiddleware>();
 
 app.UseAuthorization();
 
 app.MapControllers();
 
+// On first load of the database.
 app.CreateDbIfNotExists();
 
 app.Run();

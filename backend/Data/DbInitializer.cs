@@ -33,7 +33,7 @@ public class DbInitializer
 				while (!parser.EndOfData)
 				{
 					string[] fields = parser.ReadFields();
-					if (fields.Length < 7) continue; // Skip malformed rows
+					if (fields.Length < 7) continue;
 					string countryCode = fields[0];
 					if (!context.Countries.Any(c => c.Code == countryCode)) continue;
 

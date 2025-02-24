@@ -34,6 +34,7 @@ public class CountryService
 		return countries;
 	}
 
+	// Return top 10 countries with highest WB Rates
 	public IEnumerable<Country> GetTop10Countries ()
 	{
 		var topCountries = _context.Countries
@@ -54,6 +55,7 @@ public class CountryService
 			.SingleOrDefault(p => p.Name == name);
 	}
 
+	// Create a new country
 	public Country CreateCountry(Country country)
 	{
 		var blankStat = new InternetStatistic { CountryCode = country.Code };
@@ -64,18 +66,61 @@ public class CountryService
 		return country;
 	}
 
+	// Update the WB Rate of an existing Country
 	public InternetStatistic UpdateWBRate(string code, decimal newRate)
 	{
         if (newRate < 0 || newRate > 100)
             throw new ArgumentException("Rate must be between 0 and 100.");
-
+        // Find the country Code
         var stat = _context.InternetStatistics.Find(code);
         if (stat == null) return null;
-
+        
+        // Update the rate and the year
         stat.PercentWB = newRate;
         stat.YearWB = DateTime.Now.Year;
 
         _context.SaveChanges();
         return stat;
     }
+
+    public CountryRankingDto? GetCountryRankingByCode(string code)
+    {
+        // Get all countries with at least one InternetStatistic that has both PopulationCIA and PercentWB data.
+        var countries = _context.Countries
+            .Include(c => c.InternetStatistics)
+            .AsNoTracking()
+            .Where(c => c.InternetStatistics.Any(s => s.PopulationCIA.HasValue && s.PercentWB.HasValue))
+            .ToList();
+
+        // Transform each country into a DTO with the calculated value.
+        var rankingList = countries.Select(c =>
+        {
+            var stat = c.InternetStatistics.First(s => s.PopulationCIA.HasValue && s.PercentWB.HasValue);
+            long population = stat.PopulationCIA.Value;
+            decimal percent = stat.PercentWB.Value;
+            decimal calculatedUsers = population * (percent / 100);
+
+            return new CountryRankingDto
+            {
+                Code = c.Code,
+                CountryName = c.Name,
+                Population = population,
+                PercentWB = percent,
+                CalculatedInternetUsers = calculatedUsers
+            };
+        })
+        // Order in descending order by calculated internet users.
+        .OrderByDescending(dto => dto.CalculatedInternetUsers)
+        .ToList();
+
+        // Assign ranking numbers.
+        for (int i = 0; i < rankingList.Count; i++)
+        {
+            rankingList[i].Rank = i + 1;
+        }
+
+        return rankingList.FirstOrDefault(dto => dto.Code == code);
+    }
+
+
 }

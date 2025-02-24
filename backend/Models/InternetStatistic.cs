@@ -19,6 +19,6 @@ public class InternetStatistic
 	public long? PopulationCIA { get; set; }
 	public int? YearCIA { get; set; }
 
-	[JsonIgnore]
+	[JsonIgnore] // This is just to prevent the infinite loop of references
 	public Country? Country { get; set; }
 }
