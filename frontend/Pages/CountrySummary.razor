@@ -2,7 +2,7 @@
 @inject CountryService CountryService
 
 <h3>Country Summary</h3>
-
+<!-- Form for Country Selection -->
 <select class="form-select" @onchange="OnCountrySelected">
     <option value="">-- Select a Country --</option>
     @if (countryNames != null)
@@ -54,8 +54,9 @@
         </tbody>
     </table>
 
+    <!-- Update Option for Country Data -->
     <h4>Update WB Rate</h4>
-    <EditForm Model="updateModel" OnValidSubmit="UpdateRate">
+    <EditForm Model="updateModel" OnValidSubmit="UpdateRate" style="padding-bottom: 20px">
         <DataAnnotationsValidator />
         <ValidationSummary />
 
@@ -80,6 +81,7 @@
         countryNames = await CountryService.GetCountryNamesAsync();
     }
 
+    // On-click event of selecting the Country
     private async Task OnCountrySelected(ChangeEventArgs e)
     {
         var selectedName = e.Value?.ToString();

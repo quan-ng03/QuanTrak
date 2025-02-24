@@ -4,7 +4,6 @@ services:
     build:
       context: ./backend
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=internet_statistics;User Id=countryaccess;Password=quantum1998;MultipleActiveResultSets=true;TrustServerCertificate=True
       - API_KEY=H"G(c}{W-Y5?@#[K
