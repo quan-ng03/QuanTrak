@@ -1,0 +1,21 @@
+services:
+  backend:
+    image: country-tracker-backend
+    build:
+      context: ./backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=Server=host.docker.internal,1433;Database=internet_statistics;User Id=countryaccess;Password=quantum1998;MultipleActiveResultSets=true;TrustServerCertificate=True
+      - API_KEY=H"G(c}{W-Y5?@#[K
+    ports:
+      - "5181:8080"
+
+  frontend:
+    image: country-tracker-frontend
+    build:
+      context: ./frontend
+    ports:
+      - "5030:80"
+    depends_on:
+      - backend

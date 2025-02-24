@@ -1,27 +1,22 @@
-using Country_Tracker.Components;
+using frontend;
+using MudBlazor.Services;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
+var backendUri = new Uri("http://localhost:5181");
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+var httpClient = new HttpClient
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
+    BaseAddress = backendUri
+};
+// Inject API key
+httpClient.DefaultRequestHeaders.Add("X-Api-Key", "H\"G(c}{W-Y5?@#[K");
+builder.Services.AddScoped(sp => httpClient);
+builder.Services.AddScoped<CountryService>();
+builder.Services.AddMudServices();
 
-app.UseHttpsRedirection();
 
-app.UseStaticFiles();
-app.UseAntiforgery();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.Run();
+await builder.Build().RunAsync();

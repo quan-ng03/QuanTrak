@@ -1,0 +1,80 @@
+﻿@page "/country-league"
+@inject CountryService CountryService
+
+<h3>Country League Table</h3>
+
+@if (countries == null)
+{
+    <p><em>Loading countries...</em></p>
+}
+else
+{
+    <div class="table-container " style="max-height: 400px; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 1rem;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Country</th>
+                    <th>WB Rate</th>
+                    <th>WB Year</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var country in countries)
+                {
+                    var wbData = country.InternetStatistics?.FirstOrDefault();
+                    <tr>
+                        <td>@country.Name</td>
+                        <td>@(wbData?.PercentWB?.ToString("0.##") ?? "N/A")</td>
+                        <td>@(wbData?.YearWB?.ToString() ?? "N/A")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    
+
+    <h4>Top 10 Countries by WB Rate</h4>
+    <!-- MudChart Pie Chart -->
+    @if (pieData.Length > 0 && pieLabels.Length > 0)
+    {
+
+        <MudPaper Class="pa-4" Elevation="0" Style="background-color: transparent;">
+            <MudChart ChartType="ChartType.Pie" InputData="@pieData" InputLabels="@pieLabels" Width="300px" Height="300px" />
+        </MudPaper>
+    }
+    
+
+
+}
+
+@code {
+    private List<Country>? countries;
+    private List<Country>? top10Countries;
+    private List<decimal> pieChartData = new();
+    private List<string> pieChartLabels = new();
+
+    private double[] pieData = Array.Empty<double>();
+    private string[] pieLabels = Array.Empty<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        countries = await CountryService.GetCountriesDetailsAsync();
+        countries = countries?.ToList();
+
+        // Get top 10 countries for the pie chart
+        top10Countries = await CountryService.GetTop10CountriesAsync();
+        if (top10Countries != null)
+        {
+            foreach (var country in top10Countries)
+            {
+                var wbData = country.InternetStatistics?.FirstOrDefault();
+                pieChartLabels.Add(country.Name);
+                pieChartData.Add(wbData?.PercentWB ?? 0);
+            }
+            // Convert lists to arrays for MudChart.
+            pieData = pieChartData.Select(x => (double)x).ToArray();
+            pieLabels = pieChartLabels.ToArray();
+        }
+    }
+}

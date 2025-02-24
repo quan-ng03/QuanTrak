@@ -1,0 +1,82 @@
+﻿@inject IJSRuntime jsRuntime
+
+
+<div class="sidebar-content d-flex flex-column">
+    <!-- Top Row-->
+    <div class="top-row ps-3 navbar navbar-dark">
+        <div class="container-fluid ">
+            <a class=" custom-brand " href="">QuanTrak</a>
+            <div class="d-flex align-items-center">
+                <button class="theme-toggle-button btn btn-secondary me-2" style="width:70px;"
+                        @onclick="ToggleTheme"
+                        title="Switch theme">
+                    <i class=" @(isDarkMode ? "bi-sun-fill" : "bi-moon-fill")"></i>
+                </button>
+                <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Middle -->
+    <div class="@NavMenuCssClass  flex-grow-1">
+        <nav class="flex-column">
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="country-league">
+                    <span class="bi bi-globe-nav-menu" aria-hidden="true"></span>
+                    Country League Table
+                </NavLink>
+            </div>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="country-summary">
+                    <span class="bi bi-bar-chart-line-fill-nav-menu" aria-hidden="true"></span>
+                    Country Summary
+                </NavLink>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Bottom -->
+    <div class="theme-toggle-wrapper text-center mb-5">
+        <button class="theme-toggle-button-lg btn btn-secondary"
+                style="width: 150px;"
+                @onclick="ToggleTheme">
+            <i class="@(isDarkMode ? "bi-sun-fill" : "bi-moon-fill")"></i>
+        </button>
+    </div>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+    private bool isDarkMode = false;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+
+    private async Task ToggleTheme()
+    {
+        isDarkMode = !isDarkMode;
+        await SetTheme();
+        StateHasChanged();
+    }
+
+    private async Task SetTheme()
+    {
+        var themeClass = isDarkMode ? "dark-mode" : "light-mode";
+        await jsRuntime.InvokeVoidAsync("setBodyClass", themeClass);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var currentHour = DateTime.Now.Hour;
+            // Set light mode if between 8 AM and 6 PM, else dark mode.
+            isDarkMode = (currentHour < 8 || currentHour >= 18);
+            await SetTheme();
+            StateHasChanged();
+        }
+    }
+}
