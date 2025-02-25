@@ -32,10 +32,10 @@ QuanTrak is a **full-stack web application** designed to **track and analyze the
 ---
 
 ## 🎯 **Future Roadmap**
-📌 **Phase 1:** Expand the dataset by **allowing historical data (yearly records)**  
-📌 **Phase 2:** Build **ML models** to analyze regions with the **best internet market**  
-📌 **Phase 3:** Create an **interactive world map** to visualize internet adoption trends  
-📌 **Phase 4:** Deploy the database container in **Docker**  
+📌 **Phase 1:** Deploy the database container in **Docker**  
+📌 **Phase 2:** Expand the dataset by **allowing historical data (yearly records)**  
+📌 **Phase 3:** Build **ML models** to analyze regions with the **best internet market**  
+📌 **Phase 4:** Create an **interactive world map** to visualize internet adoption trends  
 
 ---
 
