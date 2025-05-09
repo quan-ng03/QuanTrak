@@ -81,12 +81,3 @@ Want to contribute? Fork this repository and submit a PR! 🚀
 
 🚀 Developed with ❤️ by Quan Nguyen
 
----
-### **Added Elements**
-✅ **Badges/icons** for technologies  
-✅ **Organized structure** for easy understanding  
-✅ **Command snippets** for easy setup  
-✅ **API documentation**  
-✅ **Future roadmap details**  
-
-Would you like any more details or customization? 🚀
