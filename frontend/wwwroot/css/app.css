@@ -102,6 +102,12 @@ code {
     color: #c02d76;
 }
 
+.page {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
 body.light-mode {
     background-color: #F2F2F2;
     color: #000000;
@@ -122,7 +128,6 @@ body.light-mode .table {
     background-color: #ffffff;
 }
 
-/* Optional: Adjust table borders if needed */
 body.dark-mode .theme-adjusted-table table {
     border-color: #444;
 }
@@ -203,6 +208,7 @@ body.dark-mode home-animate-sentence {
         font-family: Arial, Helvetica, sans-serif;
         font-size: 3.5rem;
     }
+
     .home-custom-brand {
         font-family: "Staatliches", serif;
         font-size: 3rem;
@@ -213,9 +219,29 @@ body.dark-mode home-animate-sentence {
         text-decoration-color: #00BE35;
         text-underline-offset: 10px;
     }
+
+    .theme-toggle-button-lg {
+        display: none;
+    }
 }
 
 @media (min-width: 768px) {
+    .page {
+        flex-direction: row;
+    }
+
+    .sidebar {
+        background-image: linear-gradient(0deg, #F2F2F2 20%, #4A5A72 50%, #3D4A5D 60%);
+        width: 250px;
+        height: 100vh;
+        position: sticky;
+        top: 0;
+    }
+
+    body.dark-mode .sidebar {
+        background-image: linear-gradient(0deg, #141414 20%, #272D36 40%, #3D4A5D 50%);
+    }
+
     .welcome-sentence {
         font-family: Arial, Helvetica, sans-serif;
         font-size: 6rem;
@@ -231,4 +257,25 @@ body.dark-mode home-animate-sentence {
         text-decoration-color: #00BE35;
         text-underline-offset: 10px;
     }
+
+    .theme-toggle-button {
+        display: none;
+    }
+
+    .theme-toggle-button-lg {
+        display: inline-block;
+    }
+
+    .sidebar-content {
+        height: 100vh;
+    }
+
+    .navbar-toggler {
+        display: none;
+    }
+
+    .collapse {
+        display: block !important;
+    }
 }
+

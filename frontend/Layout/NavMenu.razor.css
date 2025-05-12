@@ -61,34 +61,7 @@
 }
 
 
-@media (max-width: 767.98px) {
-    .theme-toggle-button-lg{
-        display:none;
-    }
-}
-
 @media (min-width: 768px) {
-    .theme-toggle-button {
-        display: none;
-    }
-
-    .navbar-toggler {
-        display: none;
-    }
-
-    .collapse {
-        display: block;
-    }
-
-    .nav-scrollable {
-        /* Allow sidebar to scroll for tall menus */
-        height: calc(100vh - 3.5rem);
-        overflow-y: auto;
-    }
-
-    .sidebar-content {
-        height: 100vh;
-    }
 
     .custom-brand {
         margin-top: 10px;

@@ -1,7 +1,7 @@
 # Use the official .NET 8.0 SDK image for building
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY frontend.csproj .
+COPY . .
 RUN dotnet restore frontend.csproj
 COPY . .
 RUN dotnet build frontend.csproj -c Release -o /app/build
