@@ -41,14 +41,13 @@ else
             <span class="slide-in rank-value"
                   style="display: inline-block; width: 140px; text-align:center"
                   id="rankValue">
-                @(ranking.Rank)@(GetOrdinalSuffix(ranking.Rank))
-            </span>
+    @(ranking?.Rank > 0 ? $"{ranking.Rank}{GetOrdinalSuffix(ranking.Rank)}" : "Unranked")
+</span>
             <br />
             in the list of
-            <span>
-                @totalEligibleCountries
-            </span>
+            <span>@totalEligibleCountries</span>
             countries.
+
         </MudText>
     </div>
 }
@@ -75,17 +74,19 @@ else
     protected override async Task OnInitializedAsync()
     {
         countries = await CountryService.GetCountriesDetailsAsync() ?? new List<Country>();
-        totalEligibleCountries = countries.Count(c =>
-            c.InternetStatistics?.Any(s =>
-            s.PopulationCIA.HasValue &&
-            (s.PercentWB.HasValue || s.PercentITU.HasValue)) ?? false);
+        Console.WriteLine($"[Init] Loaded {countries.Count} countries.");
+
+        var allRankings = await CountryService.GetAllRankingsAsync();
+        totalEligibleCountries = allRankings.Count(r => r.Rank > 0);
+        Console.WriteLine($"[Init] {totalEligibleCountries} countries are ranked.");
 
         if (countries.Any())
         {
             currentCountry = countries[currentIndex];
+            Console.WriteLine($"[Init] Starting with {currentCountry.Name} ({currentCountry.Code})");
+
             await UpdateCurrentCountryDisplayAsync();
 
-            // Start a timer to update the header every 7 seconds
             timer = new Timer(async _ =>
             {
                 await InvokeAsync(UpdateCountryAsync);
@@ -156,15 +157,8 @@ else
         }
         selectedPercentageFormatted = selectedPercentage?.ToString("0.##") ?? "N/A";
 
-        // If we have valid population and percentage data, retrieve the ranking.
-        if (stat.PopulationCIA.HasValue && selectedPercentage.HasValue)
-        {
-            ranking = await CountryService.GetCountryRankingAsync(currentCountry.Code!);
-        }
-        else
-        {
-            ranking = null;
-        }
+        ranking = await CountryService.GetCountryRankingAsync(currentCountry.Code!);
+
     }
 
     private string GetOrdinalSuffix(int rank)

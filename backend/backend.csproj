@@ -7,17 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="9.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="9.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-  </ItemGroup>
+  <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="8.0.4" />
+  <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="8.0.4" />
+  <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.4" />
+  <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.4">
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    <PrivateAssets>all</PrivateAssets>
+  </PackageReference>
+  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.411" />
+  <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
+  <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.3" />
+  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+</ItemGroup>
 
   <ItemGroup>
     <Folder Include="Seed\" />

@@ -16,13 +16,6 @@ public class CountryService
     {
         return await _httpClient.GetFromJsonAsync<List<Country>>("api/Country/details");
     }
-
-    // Gets top 10 countries for pie chart
-    public async Task<List<Country>> GetTop10CountriesAsync()
-    {
-        return await _httpClient.GetFromJsonAsync<List<Country>>("api/Country/top10");
-    }
-
     // Gets a list of all country names (if needed for dropdown)
     public async Task<List<string>> GetCountryNamesAsync()
     {
@@ -43,7 +36,7 @@ public class CountryService
 
     public async Task<InternetStatistic> UpdateWBRateAsync(string code, decimal newRate)
     {
-        var response = await _httpClient.PutAsJsonAsync($"api/country/{code}", newRate);
+        var response = await _httpClient.PutAsJsonAsync($"api/Country/{code}", newRate);
         if (response.IsSuccessStatusCode)
         {
             return await response.Content.ReadFromJsonAsync<InternetStatistic>();
@@ -55,9 +48,27 @@ public class CountryService
         }
     }
 
-    public async Task<CountryRankDTO> GetCountryRankingAsync(string code)
+    public async Task<CountryRankDTO?> GetCountryRankingAsync(string code)
     {
-        return await _httpClient.GetFromJsonAsync<CountryRankDTO>($"api/Country/ranking/{code}");
+        try
+        {
+            return await _httpClient.GetFromJsonAsync<CountryRankDTO>($"api/Country/ranking/{code}");
+        }
+        catch (HttpRequestException ex)
+        {
+            // Optionally handle 404s gracefully
+            return null;
+        }
+    }
+    
+    public async Task<List<CountryRankDTO>> GetTopRankedCountriesAsync(int count = 10)
+    {
+        return await _httpClient.GetFromJsonAsync<List<CountryRankDTO>>($"api/Country/ranking/top/{count}");
+    }
+    
+    public async Task<List<CountryRankDTO>> GetAllRankingsAsync()
+    {
+        return await _httpClient.GetFromJsonAsync<List<CountryRankDTO>>("api/Country/ranking");
     }
 
 }

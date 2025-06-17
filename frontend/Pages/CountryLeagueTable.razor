@@ -36,7 +36,7 @@ else
 
     
 
-    <h4>Top 10 Countries by WB Rate</h4>
+    <h4>Top 10 Countries by Internet Users</h4>
     <!-- Internet Usage Pie Chart -->
     <MudPaper Class="pa-4" Elevation="0" Style="background-color: transparent;">
         <MudChart ChartType="ChartType.Pie"
@@ -62,43 +62,41 @@ else
 }
 
 @code {
-    private List<Country>? countries;
-    private List<Country>? top10Countries;
+    private List<Country>?            countries;          // stays the same
+    private List<CountryRankDTO>?     top10Countries;     // was List<Country>
 
-    // Data for the first chart (internet penetration percentages)
-    private List<decimal> pieChartData = new();
-    // Data for the second chart (population values)
-    private List<decimal> piePopulationChartData = new();
-    private List<string> pieChartLabels = new();
+    private readonly List<decimal>    pieChartData          = new();
+    private readonly List<decimal>    piePopulationChartData= new();
+    private readonly List<string>     pieChartLabels        = new();
 
-    private double[] pieData = Array.Empty<double>();
-    private double[] piePopulationData = Array.Empty<double>();
-    private string[] pieLabels = Array.Empty<string>();
+    private double[] pieData            = Array.Empty<double>();
+    private double[] piePopulationData  = Array.Empty<double>();
+    private string[] pieLabels          = Array.Empty<string>();
+
+    private const int count = 10;
 
 
     protected override async Task OnInitializedAsync()
     {
+        // full details (still Country objects)
         countries = await CountryService.GetCountriesDetailsAsync();
-        countries = countries?.ToList();
 
-        // Retrieve the top 10 countries (assumed to be sorted by some criterion)
-        top10Countries = await CountryService.GetTop10CountriesAsync();
-        if (top10Countries != null)
+        // top-ranked list (now DTOs)
+        top10Countries = await CountryService.GetTopRankedCountriesAsync(count);
+
+        if (top10Countries is not null)
         {
-            foreach (var country in top10Countries)
+            foreach (var dto in top10Countries)
             {
-                var stat = country.InternetStatistics?.FirstOrDefault();
-                // Add the country name for labels
-                pieChartLabels.Add(country.Name);
-                // For internet usage, use the WB percentage (or 0 if missing)
-                pieChartData.Add(stat?.PercentWB ?? 0);
-                // For population, use PopulationCIA (or 0 if missing)
-                piePopulationChartData.Add(stat?.PopulationCIA ?? 0);
+                pieChartLabels.Add(dto.CountryName ?? dto.Code);
+                pieChartData.Add(dto.PercentWB);           // WB %
+                piePopulationChartData.Add(dto.Population); // Population
             }
-            // Convert the lists to arrays for MudChart.
-            pieData = pieChartData.Select(x => (double)x).ToArray();
-            piePopulationData = piePopulationChartData.Select(x => (double)x).ToArray();
-            pieLabels = pieChartLabels.ToArray();
+
+            pieData            = pieChartData.Select(x => (double)x).ToArray();
+            piePopulationData  = piePopulationChartData.Select(x => (double)x).ToArray();
+            pieLabels          = pieChartLabels.ToArray();
         }
     }
+
 }

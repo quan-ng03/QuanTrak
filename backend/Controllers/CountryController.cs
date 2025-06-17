@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace backend.Controllers;
 
 [ApiController]
-[Route("/api/[controller]")]
+[Route("api/[controller]")]
 public class CountryController : ControllerBase
 {
 	private readonly CountryService _service;
@@ -29,13 +29,6 @@ public class CountryController : ControllerBase
 	{
 		return _service.GetCountriesDetails();
 	}
-
-    // GET top 10 countires WB rate
-    [HttpGet("top10")]
-    public IEnumerable<Country> GetTop10Countries()
-    {
-		return _service.GetTop10Countries();
-    }
 
 
     // GET a certain country
@@ -71,15 +64,26 @@ public class CountryController : ControllerBase
         }
     }
 
+	
+	[HttpGet("ranking")]
+	public IActionResult GetAllRankings()
+	{
+		var list = _service.GetFullCountryRankingList();
+		return Ok(list);
+	}
+	
     // GET the ranking of a country
     [HttpGet("ranking/{code}")]
     public IActionResult GetCountryRanking(string code)
     {
-        var rankingDto = _service.GetCountryRankingByCode(code);
-        if (rankingDto == null)
-        {
-            return NotFound($"Country with code {code} not found or insufficient data.");
-        }
-        return Ok(rankingDto);
+	    var dto = _service.GetCountryRankingByCode(code);
+	    return dto == null ? NotFound($"Country with code {code} not found.") : Ok(dto);
+    }
+    
+    [HttpGet("ranking/top/{count}")]
+    public IActionResult GetTopRankings(int count)
+    {
+	    var list = _service.GetTopRankedCountries(count);
+	    return Ok(list);
     }
 }

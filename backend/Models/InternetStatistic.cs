@@ -6,19 +6,26 @@ using System.Text.Json.Serialization;
 public class InternetStatistic
 {
 	[Key]
-	[Required]
-	[ForeignKey(nameof(Country))]
-	public string? CountryCode { get; set; }
+	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+	public int Id { get; set; }
 
+	[ForeignKey(nameof(Country))]
+	[Column(TypeName = "varchar(10)")]
+	public string CountryCode { get; set; } = default!;
+
+	[Column(TypeName = "numeric")]
 	public decimal? PercentWB { get; set; }
+
 	public int? YearWB { get; set; }
 
+	[Column(TypeName = "numeric")]
 	public decimal? PercentITU { get; set; }
+
 	public int? YearITU { get; set; }
 
 	public long? PopulationCIA { get; set; }
 	public int? YearCIA { get; set; }
 
-	[JsonIgnore] // This is just to prevent the infinite loop of references
-	public Country? Country { get; set; }
+	[JsonIgnore]
+	public Country Country { get; set; } = default!;
 }

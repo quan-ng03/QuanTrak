@@ -82,45 +82,64 @@ public class CountryService
         _context.SaveChanges();
         return stat;
     }
+	
+	private List<CountryRankingDto> BuildCountryRankingList()
+	{
+		var countries = _context.Countries
+			.Include(c => c.InternetStatistics)
+			.AsNoTracking()
+			.ToList();
 
-    public CountryRankingDto? GetCountryRankingByCode(string code)
-    {
-        // Get all countries with at least one InternetStatistic that has both PopulationCIA and PercentWB data.
-        var countries = _context.Countries
-            .Include(c => c.InternetStatistics)
-            .AsNoTracking()
-            .Where(c => c.InternetStatistics.Any(s => s.PopulationCIA.HasValue && s.PercentWB.HasValue))
-            .ToList();
+		var rankedList = new List<CountryRankingDto>();
+		var unrankedList = new List<CountryRankingDto>();
 
-        // Transform each country into a DTO with the calculated value.
-        var rankingList = countries.Select(c =>
-        {
-            var stat = c.InternetStatistics.First(s => s.PopulationCIA.HasValue && s.PercentWB.HasValue);
-            long population = stat.PopulationCIA.Value;
-            decimal percent = stat.PercentWB.Value;
-            decimal calculatedUsers = population * (percent / 100);
+		foreach (var c in countries)
+		{
+			var stat = c.InternetStatistics.FirstOrDefault(s => s.PopulationCIA.HasValue && s.PercentWB.HasValue);
 
-            return new CountryRankingDto
-            {
-                Code = c.Code,
-                CountryName = c.Name,
-                Population = population,
-                PercentWB = percent,
-                CalculatedInternetUsers = calculatedUsers
-            };
-        })
-        // Order in descending order by calculated internet users.
-        .OrderByDescending(dto => dto.CalculatedInternetUsers)
-        .ToList();
+			var dto = new CountryRankingDto
+			{
+				Code = c.Code,
+				CountryName = c.Name,
+				Population = stat?.PopulationCIA ?? 0,
+				PercentWB = stat?.PercentWB ?? 0,
+				CalculatedInternetUsers = (stat?.PopulationCIA ?? 0) * ((stat?.PercentWB ?? 0) / 100),
+				Rank = 0 // temp default
+			};
 
-        // Assign ranking numbers.
-        for (int i = 0; i < rankingList.Count; i++)
-        {
-            rankingList[i].Rank = i + 1;
-        }
+			if (stat != null)
+				rankedList.Add(dto);
+			else
+				unrankedList.Add(dto);
+		}
 
-        return rankingList.FirstOrDefault(dto => dto.Code == code);
-    }
+		// Sort and assign ranks to valid entries
+		rankedList = rankedList
+			.OrderByDescending(dto => dto.CalculatedInternetUsers)
+			.ToList();
 
+		for (int i = 0; i < rankedList.Count; i++)
+			rankedList[i].Rank = i + 1;
 
+		return rankedList.Concat(unrankedList).ToList();
+	}
+	
+	public List<CountryRankingDto> GetFullCountryRankingList()
+	{
+		return BuildCountryRankingList();
+	}
+	
+	public List<CountryRankingDto> GetTopRankedCountries(int count)
+	{
+		return BuildCountryRankingList()
+			.Where(dto => dto.Rank > 0)
+			.Take(count)
+			.ToList();
+	}
+	
+	public CountryRankingDto? GetCountryRankingByCode(string code)
+	{
+		return BuildCountryRankingList()
+			.FirstOrDefault(dto => dto.Code == code);
+	}
 }
